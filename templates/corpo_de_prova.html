@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1>Dosagem</h1>
+
+
+
+<div class="container">
+    <div class = "row">
+        <div class="col-3">
+            <br>
+
+            campo add corpo de prova
+            <form method="POST" action='/corpo_de_prova/1'>
+                <input size="3" class="form-control-sm" value="" name="resistencia_piloto">
+                <input type="submit" value="Add">
+                <br>
+                <input size="3" class="form-control-sm" value="" name="resistencia_rico">
+                <input type="submit" value="Add2">
+
+            </form>
+        </div>
+
+        <div class="col-9">
+            <div class="container">
+
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/dosagem/{{ id }}">Piloto</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="/auxiliar/{{ id }}">Auxiliar</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/corpo_de_prova/{{ id }}">Corpo de Prova</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/resultados/{{ id }}">Resultados</a>
+              </li>
+            </ul>
+            <br>
+
+            <h4>Corpos de prova adicionados</h4>
+
+            <div class="col-3">
+
+
+                <table class='table table-bordered'>
+                    <tr>
+                        <td colspan="3">Piloto</td>
+                    </tr>
+                    <tr>
+                        <td>#</td>
+                        <td>Resistência (MPa)</td>
+                        <td></td>
+                    </tr>
+                    <td>1</td>
+                    <td>15</td>
+                    <td><a class="btn btn-danger btn-sm">DELETAR</a></td>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}

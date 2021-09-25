@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1>Dosagem</h1>
+
+
+
+<div class="container">
+    <div class = "row">
+        <div class="col-3">
+        
+            <br>
+
+        </div>
+
+        <div class="col-9">
+            <div class="container">
+
+                <ul class="nav nav-tabs">
+                  <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/dosagem/{{ id }}">Piloto</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/auxiliar/{{ id }}">Auxiliar</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="/corpo_de_prova/{{ id }}">Corpo de Prova</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link active" href="/resultados/{{ id }}">Resultados</a>
+                  </li>
+                </ul>
+                <br>
+
+
+
+
+
+
+
+
+
+<div class="accordion" id="accordionPanelsStayOpenExample">
+    <div class="accordion-item">
+    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+        Tabela Traço Piloto
+        </button>
+    </h2>
+    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+        <div class="accordion-body">
+
+                <h4>Traço PILOTO<br>m: {{ m }}<br>Slump: {{ slump }} mm</h4>
+                <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class = "align-middle">Alfa</th>
+                        <th colspan="3">Traço unitário</th>
+                        <th colspan="3">Consumo de materiais</th>
+                        <th colspan="2">Acréscimos</th>
+                        <th rowspan="2">Consumo de água para atingir o abatimento (kg)</th>
+                        <th rowspan="2"></th>
+                        <th rowspan="2"></th><tr>
+                        <th>Cimento</th>
+                        <th>Areia</th>
+                        <th>Brita</th>
+                        <th>Cimento</th>
+                        <th>Areia</th>
+                        <th>Brita</th>
+                        <th>Cimento</th>
+                        <th>Areia</th>
+                    </tr>
+                </thead>
+                </table>
+  
+
+        </div>
+    </div>
+</div>
+<div class="accordion-item">
+    <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+        Tabela Traço Rico
+
+        </button>
+    </h2>
+    <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+        <div class="accordion-body">
+
+        conteudo 2
+
+        </div>
+    </div>
+</div>
+    <div class="accordion-item">
+    <h2 class="accordion-header" id="panelsStayOpen-headingThree">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+        Tabela Traço Pobre
+        </button>
+    </h2>
+    <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
+        <div class="accordion-body">
+
+        conteudo 3
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
+
+
+
+
+
+
+

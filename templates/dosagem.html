@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1>Dosagem FALTA O AVISO NO DELETE E DO UPDATE</h1>
+
+
+
+<div class="container">
+    <div class = "row">
+        <div class="col-3">
+        
+        <br>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{ form.alfa.label }}<br>
+            {{ form.alfa(size=3) }}{{ form.submit(class="btn btn-secondary") }}
+        </form>
+
+        </div>
+
+        <div class="col-9">
+            <div class="container">
+
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/dosagem/{{ id }}">Piloto</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/auxiliar/{{ id }}">Auxiliar</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/corpo_de_prova/{{ id }}">Corpo de Prova</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/resultados/{{ id }}">Resultados</a>
+              </li>
+            </ul>
+        <br>
+        <h4>Traço PILOTO<br>m: {{ m }}<br>Slump: {{ slump }} mm</h4>
+
+
+        <table class="table table-dark table-hover table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th colspan="4">Acréscimos para determinação do teor ideal de argamassa</th>
+                <th></th>
+                <th></th>
+            <tr>
+                <th>#</th>
+                <th>Alfa</th>
+                <th>Cimento</th>
+                <th>Areia</th>
+                <th>Brita</th>
+                <th>Água</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for i in dosagens_do_ensaio_salvo %}
+        <form method="POST" action="/agua">
+        <tr>
+            <td>{{ i.indice }}</td>
+            <td>{{ i.alfa }}</td>
+            {% if i.indice == 0 %}
+                <td>{{ i.c_massa }}</td>
+                <td>{{ i.a_massa }}</td>
+                <td>{{ pesobrita }}</td>
+            {% else %}
+                <td> + {{ i.c_acr }}</td>
+                <td> + {{ i.a_acr }}</td>
+                <td> + 0 </td>
+            {% endif %}
+            <td><input type="hidden" value="{{ i.id }}" name="i_id">
+            <input type="text" size="3" class="form-control-sm" value="{{ i.agua }}" name="valor_agua_novo"></td>
+            <td><input type="submit" value="Update"></td>
+            <td><a href="/dosagem/delete/{{ i.id }}" class="btn btn-danger btn-sm">DELETAR</a></td>
+            </form>
+        </tr>
+        {% endfor %}
+        </tbody>
+
+
+        </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}

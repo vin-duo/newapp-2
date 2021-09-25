@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1>Criar Ensaio</h1>
+
+<div class="container">
+    <form method="POST">
+        {{ form.hidden_tag() }}
+    
+        {{ form.nome.label }}<br>
+        {{ form.nome(size=15) }}<br>
+
+        {{ form.piloto.label }}<br>
+        {{ form.piloto(size=3) }}<br>
+
+        {{ form.rico.label }}<br>
+        {{ form.rico(size=3) }}<br>
+
+        {{ form.pobre.label }}<br>
+        {{ form.pobre(size=3) }}<br>
+
+        {{ form.pesobrita.label }}<br>
+        {{ form.pesobrita(size=3) }}<br>
+
+        {{ form.slump.label }}<br>
+        {{ form.slump(size=3) }}<br>
+
+        {{ form.submit }}
+    </form>
+</div>
+
+
+{% endblock %}
