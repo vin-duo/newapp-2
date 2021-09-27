@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
 
 
@@ -13,11 +14,14 @@
             <br>
 
             campo add corpo de prova
-            <form method="POST" action='/corpo_de_prova/1'>
+            <form method="POST">
                 <input size="3" class="form-control-sm" value="" name="resistencia_piloto">
                 <input type="submit" value="Add">
                 <br>
                 <input size="3" class="form-control-sm" value="" name="resistencia_rico">
+                <input type="submit" value="Add2">
+                <br>
+                <input size="3" class="form-control-sm" value="" name="resistencia_pobre">
                 <input type="submit" value="Add2">
 
             </form>
@@ -31,10 +35,10 @@
                 <a class="nav-link" aria-current="page" href="/dosagem/{{ id }}">Piloto</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="/auxiliar/{{ id }}">Auxiliar</a>
+                <a class="nav-link" href="/auxiliar/{{ id }}">Auxiliar</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/corpo_de_prova/{{ id }}">Corpo de Prova</a>
+                <a class="nav-link active" href="/corpo_de_prova/{{ id }}">Corpo de Prova</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/resultados/{{ id }}">Resultados</a>
@@ -56,9 +60,52 @@
                         <td>Resistência (MPa)</td>
                         <td></td>
                     </tr>
-                    <td>1</td>
-                    <td>15</td>
-                    <td><a class="btn btn-danger btn-sm">DELETAR</a></td>
+
+                    {% for i in ensaio_salvo.cp_piloto %}
+                        <tr>
+                        <td>indice</td>
+                        <td>{{ i.resistencia }}</td>
+                        <td><a class="btn btn-danger btn-sm" href="/corpo_de_prova/deletar_piloto/{{ i.id }}">DELETAR</a></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <table class='table table-bordered'>
+                    <tr>
+                        <td colspan="3">Rico</td>
+                    </tr>
+                    <tr>
+                        <td>#</td>
+                        <td>Resistência (MPa)</td>
+                        <td></td>
+                    </tr>
+
+                    {% for i in ensaio_salvo.cp_rico %}
+                        <tr>
+                        <td>indice</td>
+                        <td>{{ i.resistencia }}</td>
+                        <td><a class="btn btn-danger btn-sm" href="/corpo_de_prova/deletar_rico/{{ i.id }}">DELETAR</a></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+                <table class='table table-bordered'>
+                    <tr>
+                        <td colspan="3">Pobre</td>
+                    </tr>
+                    <tr>
+                        <td>#</td>
+                        <td>Resistência (MPa)</td>
+                        <td></td>
+                    </tr>
+
+                    {% for i in ensaio_salvo.cp_pobre %}
+                        <tr>
+                        <td>indice</td>
+                        <td>{{ i.resistencia }}</td>
+                        <td><a class="btn btn-danger btn-sm" href="/corpo_de_prova/deletar_pobre/{{ i.id }}">DELETAR</a></td>
+                    </tr>
+                    {% endfor %}
                 </table>
 
 
@@ -66,9 +113,6 @@
         </div>
     </div>
 </div>
-
-
-
 
 
 {% endblock %}

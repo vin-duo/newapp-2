@@ -56,7 +56,6 @@ def criar():
         pobre = form.pobre.data,
         pesobrita = form.pesobrita.data,
         slump = form.slump.data)
-        print(novo_ensaio)
         db.session.add(novo_ensaio)
         db.session.commit()
 
@@ -83,9 +82,6 @@ def editar_ensaio(id):
     form = Criar_ensaio()
 
     editar = Ensaios.query.get_or_404(id)
-#    print(editar)
-#    print(editar.nome)
-#    print(form.nome.data)
     
     if form.validate_on_submit():
         editar.nome = form.nome.data
@@ -97,7 +93,6 @@ def editar_ensaio(id):
         editar.slump = form.slump.data
 #        editar.umidade = form.umidade.data
         db.session.commit()
-        print('to aq')
         return redirect('/home')
     return render_template('editar_ensaio.html', form=form, editar=editar)
 
@@ -111,7 +106,7 @@ def dosagem(id):
 
     ensaio_salvo = Ensaios.query.filter_by(id=id).first()
     dosagens_do_ensaio_salvo = ensaio_salvo.dosagem_piloto
-    print(dosagens_do_ensaio_salvo)
+
     m = ensaio_salvo.piloto
 #    cp = ensaio_salvo.cp
     pesobrita = ensaio_salvo.pesobrita
@@ -119,40 +114,21 @@ def dosagem(id):
 #    umidade = ensaio_salvo.umidade
 
     if dosagens_do_ensaio_salvo != []:
-        print('cai no if nao vazio')
-
         contador = 0
         indice = 0
         for i in dosagens_do_ensaio_salvo:
-
             alfa = i.alfa
-            print("alfa dentro do for")
-            print(alfa)
 
             if contador == 0:
                 alfaantigo = 0
-
-                print('to no alfaantigo = 0')
-                print(alfaantigo)
-                print(alfa)
-                print('saíndo desse if')
             else:
                 alfaantigo = dosagens_do_ensaio_salvo[contador-1].alfa
-                print('else do for')
-
-            print("fora do laço")
-            print(m)
-            print(alfa)
-            print(alfaantigo)
 
             traco = Ensaio(
                 m = m,
                 alfa = alfa, 
                 pesobrita = pesobrita,
                 alfaantigo = alfaantigo)
-
-            print("print da agua")
-            print(i.agua)
 
             i.alfa = alfa
             i.c_unitario = traco.massas_unitarias()[0]
@@ -175,20 +151,12 @@ def dosagem(id):
             db.session.commit()
             contador = contador + 1
             indice = indice + 1
-            print("deu commit")
 
-        print("to esperando validate")
     if form.validate_on_submit():
-        print('entrei no validate')
         add_no_db = Dosagem_piloto(alfa=form.alfa.data, ensaio = ensaio_salvo)
-
         db.session.add(add_no_db)
         db.session.commit()
-        print("add_no_db dentro do validade")
-        print(add_no_db)
         return redirect ('/dosagem/{}'.format(id))
-
-    print('to no final')
     return render_template("dosagem.html", form=form, id=id, dosagens_do_ensaio_salvo=dosagens_do_ensaio_salvo, m=m, slump=slump, pesobrita=pesobrita)
 
 
@@ -210,16 +178,8 @@ def update_agua():#o nome "valor_alfa" é o nome dado no html para um elemento n
 @app.route('/auxiliar/<int:id>', methods=['POST', 'GET'])
 def dosagem_auxiliar(id):
 
-    print("\niniciei o Auxiliar")
     form = Alfa()
     ensaio_salvo = Ensaios.query.filter_by(id=id).first()
-
-
-    print("\nensaio_salvo.dosagem_rico")
-    a = ensaio_salvo.dosagem_rico
-    print(a)
-
-
 
     m_rico = ensaio_salvo.rico
     m_pobre = ensaio_salvo.pobre
@@ -228,11 +188,8 @@ def dosagem_auxiliar(id):
     pesobrita = ensaio_salvo.pesobrita
     slump = ensaio_salvo.slump
 
-
     if form.validate_on_submit():
-        print("entrei no validate")
         if ensaio_salvo.dosagem_rico == []:
-            print("entrei no IF")
             traco = Ensaio(
                 m = m_rico,
                 alfa = form.alfa.data, 
@@ -275,21 +232,11 @@ def dosagem_auxiliar(id):
                 agua = 0,
                 ensaio = ensaio_salvo)
 
-            print("\nensaio_salvo.dosagem_rico")
-            a = ensaio_salvo.dosagem_rico
-            print(a)
-
             db.session.add(add_no_db_rico)
             db.session.add(add_no_db_pobre)
             db.session.commit()
-            print('deu commit no if')
+
         else:
-
-            print('entrei no ELSE')
-            print('como ta o ensaio_salvo.dosagem_rico agora:')
-            a = ensaio_salvo.dosagem_rico
-            print(a)
-
             rico_velho = ensaio_salvo.dosagem_rico[0]
             pobre_velho = ensaio_salvo.dosagem_pobre[0]
             db.session.delete(rico_velho)
@@ -339,11 +286,7 @@ def dosagem_auxiliar(id):
                 ensaio = ensaio_salvo)
             db.session.add(add_no_db_rico)
             db.session.add(add_no_db_pobre)
-            print("ensaio_salvo.dosagem_rico antes do commit")
-            a = ensaio_salvo.dosagem_rico
-            print(a)
             db.session.commit()
-            print('deu commit')
         return redirect('/auxiliar/{}'.format(id))
     return render_template("auxiliar.html", form=form, ensaio_salvo=ensaio_salvo, id=id, m_rico=m_rico, m_pobre=m_pobre, slump=slump)
 
@@ -366,7 +309,6 @@ def delete(id):
     return redirect('/dosagem/{}'.format(dosagem_deletada.ensaio.id))
 
 
-
 @app.route('/dosagem_auxiliar/delete/<int:id>')#esse id é da linha na tabela Dosagem_piloto
 def delete_auxiliar(id):
     #linha da dosagem a ser deletara
@@ -381,14 +323,9 @@ def delete_auxiliar(id):
 
     db.session.delete(dosagem_deletada_rico)
     db.session.delete(dosagem_deletada_pobre)
-
     db.session.commit()
 
     return redirect('/auxiliar/{}'.format(id_do_ensaio))
-
-
-
-
 
 
 @app.route('/resultados/<int:id>', methods=['POST', 'GET'])
@@ -399,45 +336,91 @@ def resultados(id):
     return render_template('resultados.html', id=id)
 
 
-
-
 @app.route('/corpo_de_prova/<int:id>', methods=['POST', 'GET'])
 def corpo_de_prova(id):
 #    form = Resistencia()#CRIAR O FORMULARIO DA RESISTENCIA IGUAL DO ALFA
 #    if form.validate_on_submit():
 #        pass
-    a = float(request.form.get("resistencia_piloto"))
-    print('a')
-    print(type(a))
-    print(a*3)
 
-    b = request.form.get("resistencia_rico")
-    print('b')
-    print(type(b))
-    print(b*3)
+    ensaio_salvo = Ensaios.query.filter_by(id=id).first()
+    cps_piloto = Cp_piloto.query.all()
+    cps_rico = Cp_rico.query.all()
+    cps_pobre = Cp_pobre.query.all()
+    print('\nid')
+    print(id)
+    print(cps_piloto)
+    print(cps_rico)
+    print(cps_pobre)
 
-    return render_template('corpo_de_prova.html', id=id)
+    r_piloto = request.form.get("resistencia_piloto")
+    r_rico = request.form.get("resistencia_rico")
+    r_pobre = request.form.get("resistencia_pobre")
+
+    if request.method == 'POST':
+
+        if r_piloto != "":
+            print('entrei piloto diferente de None')
+#            print(r_piloto)
+            cp_piloto = Cp_piloto(resistencia=r_piloto, ensaio=ensaio_salvo)
+            db.session.add(cp_piloto)
+            db.session.commit()
+        if r_rico != "":
+            print('entrei rico diferente de None')
+#            print(r_rico)
+#            print(type(r_rico))
+            cp_rico = Cp_rico(resistencia=r_rico, ensaio=ensaio_salvo)
+            db.session.add(cp_rico)
+            db.session.commit()
+        if r_pobre != "":
+            print('entrei pobre diferente de None')
+#            print(r_pobre)
+            cp_pobre = Cp_pobre(resistencia=r_pobre, ensaio=ensaio_salvo)
+            db.session.add(cp_pobre)
+            db.session.commit()
+        return redirect('/corpo_de_prova/{}'.format(id))
+    return render_template('corpo_de_prova.html', id=id, cps_piloto=cps_piloto, cps_rico=cps_rico, cps_pobre=cps_pobre, ensaio_salvo=ensaio_salvo)
 
 
-
-
-
-@app.route('/corpo_de_prova/deletar/<int:id>')
-def deletar_corpo_de_prova(id):
-    apagar = Corpo_de_prova.query.get_or_404(id)#CRIAR A TABELA DO CORPO DE PROVA
+@app.route('/corpo_de_prova/deletar_piloto/<int:id>')
+def deletar_corpo_de_prova_piloto(id):
+    apagar = Cp_piloto.query.get_or_404(id)#CRIAR A TABELA DO CORPO DE PROVA
+    print('apagar.ensaio.id')
+    print(apagar.ensaio.id)
 
     try:
         db.session.delete(apagar)
         db.session.commit()
-        return redirect('/home')
-
+        return redirect('/corpo_de_prova/{}'.format(apagar.ensaio.id))
     except:
         "DEU ERRADO"
 
 
+@app.route('/corpo_de_prova/deletar_rico/<int:id>')
+def deletar_corpo_de_prova_rico(id):
+    apagar = Cp_rico.query.get_or_404(id)#CRIAR A TABELA DO CORPO DE PROVA
+    print('apagar.ensaio.id')
+    print(apagar.ensaio.id)
+
+    try:
+        db.session.delete(apagar)
+        db.session.commit()
+        return redirect('/corpo_de_prova/{}'.format(apagar.ensaio.id))
+    except:
+        "DEU ERRADO"
 
 
+@app.route('/corpo_de_prova/deletar_pobre/<int:id>')
+def deletar_corpo_de_prova_pobre(id):
+    apagar = Cp_pobre.query.get_or_404(id)#CRIAR A TABELA DO CORPO DE PROVA
+    print('apagar.ensaio.id')
+    print(apagar.ensaio.id)
 
+    try:
+        db.session.delete(apagar)
+        db.session.commit()
+        return redirect('/corpo_de_prova/{}'.format(apagar.ensaio.id))
+    except:
+        "DEU ERRADO"
 
 
 
@@ -462,6 +445,9 @@ class Ensaios(db.Model):
     dosagem_piloto = db.relationship('Dosagem_piloto', backref='ensaio')
     dosagem_rico = db.relationship('Dosagem_rico', backref='ensaio')
     dosagem_pobre = db.relationship('Dosagem_pobre', backref='ensaio')
+    cp_piloto = db.relationship('Cp_piloto', backref='ensaio')
+    cp_rico = db.relationship('Cp_rico', backref='ensaio')
+    cp_pobre = db.relationship('Cp_pobre', backref='ensaio')
 
     def __repr__(self):
         return '\n<id: {}, nome: {} piloto: {}, rico: {}, pobre: {}, cp: {}, pesobrita: {}, slump: {}, umidade: {}, relation {} >'.format(self.id, self.nome, self.piloto, self.rico, self.pobre, self.cp, self.pesobrita, self.slump, self.umidade, self.dosagem_piloto)
@@ -489,6 +475,7 @@ class Dosagem_piloto(db.Model):
 
     indice = db.Column(db.Integer)
     ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
+
     def __repr__(self):
         return '\n<id: {}, Piloto: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.b_massa, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id)
    
@@ -513,9 +500,11 @@ class Dosagem_rico(db.Model):
     agua = db.Column(db.Integer)
 
     ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
+
     def __repr__(self):
         return '\n<id: {}, Rico: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.b_massa, self.a_massa_umida, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id)
    
+
 class Dosagem_pobre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     alfa = db.Column(db.Integer)
@@ -531,20 +520,41 @@ class Dosagem_pobre(db.Model):
     c_acr = db.Column(db.Integer)
     a_acr= db.Column(db.Integer)
     
-    a_massa_umida = db.Column(db.Integer)    
+    a_massa_umida = db.Column(db.Integer)
     umidade_agregado = db.Column(db.Integer)
     agua = db.Column(db.Integer)
 
     ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
+
     def __repr__(self):
         return '\n<id: {}, Pobre: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.a_massa_umida, self.b_massa, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id)
-   
 
 
+class Cp_piloto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resistencia = db.Column(db.Integer)
+    ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
+
+    def __repr__(self):
+        return '<id: {}, r: {} MPa, ensaio_id {}>'.format(self.id, self.resistencia, self.ensaio_id)
 
 
+class Cp_rico(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resistencia = db.Column(db.Integer)
+    ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
+
+    def __repr__(self):
+        return '<id: {}, r: {} MPa, ensaio_id {}>'.format(self.id, self.resistencia, self.ensaio_id)
 
 
+class Cp_pobre(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resistencia = db.Column(db.Integer)
+    ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
+
+    def __repr__(self):
+        return '<id: {}, r: {} MPa, ensaio_id {}>'.format(self.id, self.resistencia, self.ensaio_id)
 
 
 
@@ -576,27 +586,3 @@ class Pet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
     owner_id = db.Column(db.Integer, db.ForeignKey('person.id'))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
