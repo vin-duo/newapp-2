@@ -309,6 +309,7 @@ def delete(id):
     return redirect('/dosagem/{}'.format(dosagem_deletada.ensaio.id))
 
 
+
 @app.route('/dosagem_auxiliar/delete/<int:id>')#esse id é da linha na tabela Dosagem_piloto
 def delete_auxiliar(id):
     #linha da dosagem a ser deletara
