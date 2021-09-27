@@ -153,7 +153,7 @@ def dosagem(id):
             indice = indice + 1
 
     if form.validate_on_submit():
-        add_no_db = Dosagem_piloto(alfa=form.alfa.data, ensaio = ensaio_salvo)
+        add_no_db = Dosagem_piloto(alfa=form.alfa.data, agua=0, ensaio = ensaio_salvo)
         db.session.add(add_no_db)
         db.session.commit()
         return redirect ('/dosagem/{}'.format(id))
@@ -161,7 +161,7 @@ def dosagem(id):
 
 
 
-
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 @app.route("/agua", methods=["POST"])
 def update_agua():#o nome "valor_alfa" é o nome dado no html para um elemento na tabela do db. Quando cria uma linha no db, a tabela chama essa linha de "valor_alfa", que tem as propriedades "id", "alfa", "agua"......
@@ -172,6 +172,41 @@ def update_agua():#o nome "valor_alfa" é o nome dado no html para um elemento n
     db.session.commit()
     a = nova_agua.ensaio.id
     return redirect("/dosagem/{}".format(a))
+
+
+@app.route("/agua_rico", methods=["POST"])
+def update_agua_rico():#o nome "valor_alfa" é o nome dado no html para um elemento na tabela do db. Quando cria uma linha no db, a tabela chama essa linha de "valor_alfa", que tem as propriedades "id", "alfa", "agua"......
+    i_id = request.form.get("i_id")
+    valor_agua_novo = request.form.get("valor_agua_novo")
+    nova_agua = Dosagem_rico.query.filter_by(id=i_id).first()
+    nova_agua.agua = valor_agua_novo
+    db.session.commit()
+    a = nova_agua.ensaio.id
+    return redirect("/auxiliar/{}".format(a))
+
+
+@app.route("/agua_pobre", methods=["POST"])
+def update_agua_pobre():#o nome "valor_alfa" é o nome dado no html para um elemento na tabela do db. Quando cria uma linha no db, a tabela chama essa linha de "valor_alfa", que tem as propriedades "id", "alfa", "agua"......
+    i_id = request.form.get("i_id")
+    valor_agua_novo = request.form.get("valor_agua_novo")
+    nova_agua = Dosagem_pobre.query.filter_by(id=i_id).first()
+    nova_agua.agua = valor_agua_novo
+    db.session.commit()
+    a = nova_agua.ensaio.id
+    return redirect("/auxiliar/{}".format(a))
+
+
+
+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
+
+
+
+
+
+
 
 
 
@@ -329,52 +364,28 @@ def delete_auxiliar(id):
     return redirect('/auxiliar/{}'.format(id_do_ensaio))
 
 
-@app.route('/resultados/<int:id>', methods=['POST', 'GET'])
-def resultados(id):
-#    form = Confirmar_dosagem()#Criar esse formulario
-#    if form.validate_on_submit():
-#        print('validou')
-    return render_template('resultados.html', id=id)
-
-
 @app.route('/corpo_de_prova/<int:id>', methods=['POST', 'GET'])
 def corpo_de_prova(id):
-#    form = Resistencia()#CRIAR O FORMULARIO DA RESISTENCIA IGUAL DO ALFA
-#    if form.validate_on_submit():
-#        pass
 
     ensaio_salvo = Ensaios.query.filter_by(id=id).first()
     cps_piloto = Cp_piloto.query.all()
     cps_rico = Cp_rico.query.all()
     cps_pobre = Cp_pobre.query.all()
-    print('\nid')
-    print(id)
-    print(cps_piloto)
-    print(cps_rico)
-    print(cps_pobre)
 
     r_piloto = request.form.get("resistencia_piloto")
     r_rico = request.form.get("resistencia_rico")
     r_pobre = request.form.get("resistencia_pobre")
 
     if request.method == 'POST':
-
         if r_piloto != "":
-            print('entrei piloto diferente de None')
-#            print(r_piloto)
             cp_piloto = Cp_piloto(resistencia=r_piloto, ensaio=ensaio_salvo)
             db.session.add(cp_piloto)
             db.session.commit()
         if r_rico != "":
-            print('entrei rico diferente de None')
-#            print(r_rico)
-#            print(type(r_rico))
             cp_rico = Cp_rico(resistencia=r_rico, ensaio=ensaio_salvo)
             db.session.add(cp_rico)
             db.session.commit()
         if r_pobre != "":
-            print('entrei pobre diferente de None')
-#            print(r_pobre)
             cp_pobre = Cp_pobre(resistencia=r_pobre, ensaio=ensaio_salvo)
             db.session.add(cp_pobre)
             db.session.commit()
@@ -385,13 +396,11 @@ def corpo_de_prova(id):
 @app.route('/corpo_de_prova/deletar_piloto/<int:id>')
 def deletar_corpo_de_prova_piloto(id):
     apagar = Cp_piloto.query.get_or_404(id)#CRIAR A TABELA DO CORPO DE PROVA
-    print('apagar.ensaio.id')
-    print(apagar.ensaio.id)
-
+    a = apagar.ensaio.id
     try:
         db.session.delete(apagar)
         db.session.commit()
-        return redirect('/corpo_de_prova/{}'.format(apagar.ensaio.id))
+        return redirect('/corpo_de_prova/{}'.format(a))
     except:
         "DEU ERRADO"
 
@@ -399,13 +408,11 @@ def deletar_corpo_de_prova_piloto(id):
 @app.route('/corpo_de_prova/deletar_rico/<int:id>')
 def deletar_corpo_de_prova_rico(id):
     apagar = Cp_rico.query.get_or_404(id)#CRIAR A TABELA DO CORPO DE PROVA
-    print('apagar.ensaio.id')
-    print(apagar.ensaio.id)
-
+    a = apagar.ensaio.id
     try:
         db.session.delete(apagar)
         db.session.commit()
-        return redirect('/corpo_de_prova/{}'.format(apagar.ensaio.id))
+        return redirect('/corpo_de_prova/{}'.format(a))
     except:
         "DEU ERRADO"
 
@@ -413,15 +420,41 @@ def deletar_corpo_de_prova_rico(id):
 @app.route('/corpo_de_prova/deletar_pobre/<int:id>')
 def deletar_corpo_de_prova_pobre(id):
     apagar = Cp_pobre.query.get_or_404(id)#CRIAR A TABELA DO CORPO DE PROVA
-    print('apagar.ensaio.id')
-    print(apagar.ensaio.id)
-
+    a = apagar.ensaio.id
     try:
         db.session.delete(apagar)
         db.session.commit()
-        return redirect('/corpo_de_prova/{}'.format(apagar.ensaio.id))
+        return redirect('/corpo_de_prova/{}'.format(a))
     except:
         "DEU ERRADO"
+
+
+
+
+
+@app.route('/resultados/<int:id>', methods=['POST', 'GET'])
+def resultados(id):
+#    form = Confirmar_dosagem()#Criar esse formulario
+#    if form.validate_on_submit():
+#        print('validou')
+    a = Cp_piloto.query.all()
+    b = Cp_rico.query.all()
+    c = Cp_pobre.query.all()
+    print(a)
+    print(b)
+    print(c)
+    d = Ensaios.query.filter_by(id=1).first()
+    print('\nd')
+    print(d)
+    e = d.cp_piloto
+    print('e')
+    print(e)
+    return render_template('resultados.html', id=id)
+
+
+
+
+
 
 
 

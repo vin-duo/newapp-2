@@ -65,7 +65,7 @@
 
         <tbody>
         {% for i in ensaio_salvo.dosagem_rico %}
-        <form method="POST" action="/agua">
+        <form method="POST" action="/agua_rico">
         <tr>
             <td>{{ 1 }}</td>
             <td>{{ i.alfa }}</td>
@@ -109,7 +109,7 @@
 
         <tbody>
         {% for i in ensaio_salvo.dosagem_pobre %}
-        <form method="POST" action="/agua">
+        <form method="POST" action="/agua_pobre">
         <tr>
             <td>{{ 1 }}</td>
             <td>{{ i.alfa }}</td>
