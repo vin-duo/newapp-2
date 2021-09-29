@@ -11,6 +11,8 @@ from forms import Criar_ensaio, Alfa
 
 from MAIN_dosagem import Ensaio
 
+from regressao import Regressao
+
 
 
 #create a Flask Instance
@@ -194,8 +196,6 @@ def update_agua_pobre():#o nome "valor_alfa" é o nome dado no html para um elem
     db.session.commit()
     a = nova_agua.ensaio.id
     return redirect("/auxiliar/{}".format(a))
-
-
 
 #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -434,9 +434,98 @@ def deletar_corpo_de_prova_pobre(id):
 
 @app.route('/resultados/<int:id>', methods=['POST', 'GET'])
 def resultados(id):
+
+    d = Ensaios.query.filter_by(id=id).first()
+#    print(d.dosagem_piloto)#lista de elementos na tabela dosagem_piloto relacionada com Ensaios.
+#    print(d.dosagem_piloto[2].agua)#valor de agua  do elemento 2 da lista acima.
+
+
+#calculo do agua cimento certo.
+    a = []
+    for i in range(len(d.dosagem_piloto)):
+        a.append(d.dosagem_piloto[i].agua)
+    acp = sum(a)/d.dosagem_piloto[-1].c_massa
+    acr = d.dosagem_rico[-1].agua/d.dosagem_rico[-1].c_massa
+    acpb = d.dosagem_pobre[-1].agua/d.dosagem_pobre[-1].c_massa
+#    print('calculo agua cimento pobre')
+#    print('agua: {}'.format(d.dosagem_pobre[-1].agua))
+#    print('cimento: {}'.format(d.dosagem_pobre[-1].c_massa))
+
+
+#resistencias
+    p = d.cp_piloto
+    ri = d.cp_rico
+    pb = d.cp_pobre
+
+    rr = [pb[0].resistencia, p[0].resistencia, ri[0].resistencia]
+    ac = [acpb, acp, acr]
+    m = [d.pobre, d.piloto, d.rico]
+    cc = [479,371,295]
+    alfas = [1,2,3]
+
+
+
+    r = Regressao(alfas, rr, ac, m, cc)
+    print('resistencias')
+    print(rr)
+    print('agua/cimento')
+    print(ac)
+    print('valores m')
+    print(m)
+    print("k's")
+    print(r.k1())
+    print(r.k2())
+    print(r.k3())
+    print(r.k4())
+    print(r.k5())
+    print(r.k6())
+    '''
+    '''
+
+
+
+
+
+
+#   Lista com os valores [id piloto a_unitario...., id piloto....]
+#    agua_total = 0
+#    a = d.dosagem_piloto
+#    print(a)
+
+
+    '''Aqui estao colocados de forma correta os valores para a regressao.
+    print(id)
+    d = Ensaios.query.filter_by(id=id).first()
+    p = d.cp_piloto
+    ri = d.cp_rico
+    pb = d.cp_pobre
+    rr = [p[0].resistencia, ri[0].resistencia, pb[0].resistencia]
+    print(rr)
+    ac = [0.36,0.42,0.49]
+    mm = [d.piloto, d.rico, d.pobre]
+#    mm = [2,3,5]
+    cc = [479,371,295]
+    alfas = [1,2,3]
+    r = Regressao(alfas, rr, ac, mm,cc)
+    print('\nparametros')
+    print('resistencias')
+    print(rr)
+    print('ac')
+    print(ac)
+    print('m')
+    print(mm)
+    print(r.k1())
+    print(r.k2())
+    print(r.k3())
+    print(r.k4())
+    print(r.k5())
+    print(r.k6())
+    '''
+
 #    form = Confirmar_dosagem()#Criar esse formulario
 #    if form.validate_on_submit():
 #        print('validou')
+    '''
     a = Cp_piloto.query.all()
     b = Cp_rico.query.all()
     c = Cp_pobre.query.all()
@@ -449,6 +538,8 @@ def resultados(id):
     e = d.cp_piloto
     print('e')
     print(e)
+    '''
+
     return render_template('resultados.html', id=id)
 
 
@@ -497,7 +588,6 @@ class Dosagem_piloto(db.Model):
     
     c_massa = db.Column(db.Integer)
     a_massa = db.Column(db.Integer)
-
     b_massa = db.Column(db.Integer)
     
     c_acr = db.Column(db.Integer)
@@ -506,13 +596,14 @@ class Dosagem_piloto(db.Model):
     a_massa_umida = db.Column(db.Integer)    
     umidade_agregado = db.Column(db.Integer)
     agua = db.Column(db.Integer)
+    agua_cimento = db.Column(db.Integer)
 
     indice = db.Column(db.Integer)
     ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
 
     def __repr__(self):
-        return '\n<id: {}, Piloto: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.b_massa, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id)
-   
+        return '\n<id: {}, Piloto: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.b_massa, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.agua_cimento, self.indice, self.ensaio_id)
+
 
 class Dosagem_rico(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -532,12 +623,13 @@ class Dosagem_rico(db.Model):
     a_massa_umida = db.Column(db.Integer)    
     umidade_agregado = db.Column(db.Integer)
     agua = db.Column(db.Integer)
+    agua_cimento = db.Column(db.Integer)
 
     ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
 
     def __repr__(self):
-        return '\n<id: {}, Rico: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.b_massa, self.a_massa_umida, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id)
-   
+        return '\n<id: {}, Rico: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.b_massa, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id, self.agua_cimento)
+
 
 class Dosagem_pobre(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -557,11 +649,12 @@ class Dosagem_pobre(db.Model):
     a_massa_umida = db.Column(db.Integer)
     umidade_agregado = db.Column(db.Integer)
     agua = db.Column(db.Integer)
+    agua_cimento = db.Column(db.Integer)
 
     ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
 
     def __repr__(self):
-        return '\n<id: {}, Pobre: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.a_massa_umida, self.b_massa, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id)
+        return '\n<id: {}, Pobre: {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, foreign: {}>'.format(self.id, self.alfa, self.c_unitario, self.a_unitario, self.b_unitario, self.c_massa, self.a_massa, self.a_massa_umida, self.b_massa, self.c_acr, self.a_acr, self.a_massa_umida, self.umidade_agregado, self.agua, self.ensaio_id)
 
 
 class Cp_piloto(db.Model):

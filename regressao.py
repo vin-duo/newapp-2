@@ -10,6 +10,11 @@ class Regressao():
 		self.valores_C=valores_C
 		self.log_resistencias=[]
 		self.arredondamento=arredondamento
+		self.valores_C_alterados = []
+
+		for i in self.valores_C:
+			i = 1000/i
+			self.valores_C_alterados.append(i)
 
 	def media(self, x):
 		media=sum(x)/len(x)
@@ -48,18 +53,21 @@ class Regressao():
 		return round(k4,self.arredondamento)
 
 	def k5(self):
-		k5 = self.linear(self.valores_m,self.valores_C)[0]
+		k5 = self.linear(self.valores_m,self.valores_C_alterados)[0]
 		return round(k5,self.arredondamento)
 
 	def k6(self):
-		k6 = self.linear(self.valores_m,self.valores_C)[1]
+		k6 = self.linear(self.valores_m,self.valores_C_alterados)[1]
 		return round(k6,self.arredondamento)
+
+
 
 '''
 va = [1,2,3]
 vr = [38,28,20]
 vac = [0.41,0.55,0.7]
 vm = [4,5,6]
+#vc = [1000/472,1000/371,1000/309]
 vc = [472,371,309]
 
 r = Regressao(va,vr,vac,vm,vc)
@@ -71,12 +79,16 @@ print(r.k4())
 print(r.k5())
 print(r.k6())
 
+
+
 va = [1,2,3]
 vr = [57.5,43.7,31.4]
 vac = [0.36,0.42,0.49]
 vm = [3,4,5]
 vc = [479,371,295]
+
 r = Regressao(va,vr,vac,vm,vc)
+
 print('\n')
 print(r.k1())
 print(r.k2())
