@@ -7,11 +7,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 #organizar 555
-from forms import Criar_ensaio, Alfa
+from forms import Criar_ensaio, Alfa, Calcular
 
 from MAIN_dosagem import Ensaio
 
-from regressao import Regressao
+from regressao import Regressao, Calculadora
 
 
 
@@ -209,7 +209,6 @@ def update_agua_pobre():#o nome "valor_alfa" é o nome dado no html para um elem
 
 
 
-
 @app.route('/auxiliar/<int:id>', methods=['POST', 'GET'])
 def dosagem_auxiliar(id):
 
@@ -224,6 +223,7 @@ def dosagem_auxiliar(id):
     slump = ensaio_salvo.slump
 
     if form.validate_on_submit():
+
         if ensaio_salvo.dosagem_rico == []:
             traco = Ensaio(
                 m = m_rico,
@@ -429,16 +429,12 @@ def deletar_corpo_de_prova_pobre(id):
         "DEU ERRADO"
 
 
-
-
-
 @app.route('/resultados/<int:id>', methods=['POST', 'GET'])
 def resultados(id):
 
-    d = Ensaios.query.filter_by(id=id).first()
 #    print(d.dosagem_piloto)#lista de elementos na tabela dosagem_piloto relacionada com Ensaios.
 #    print(d.dosagem_piloto[2].agua)#valor de agua  do elemento 2 da lista acima.
-
+    d = Ensaios.query.filter_by(id=id).first()
 
 #calculo do agua cimento certo.
     a = []
@@ -457,97 +453,91 @@ def resultados(id):
     ri = d.cp_rico
     pb = d.cp_pobre
 
+#    print('d.cp_piloto')
+#    print(Cp_piloto.query.all())
+#    print(Cp_piloto.query.count())
+    print(Cp_piloto.query.filter_by(ensaio_id=id).count())#contando o numero de corpos de prova salvos para o ensaio com esse id (se eu to no ensaio id=3, conto o numero de linhas de corpo de prova do ensaio id=3)
+
+    numero_de_cp_rico = Cp_rico.query.filter_by(ensaio_id=id).count()
+    numero_de_cp_piloto = Cp_piloto.query.filter_by(ensaio_id=id).count()
+    numero_de_cp_pobre = Cp_pobre.query.filter_by(ensaio_id=id).count()
+#    print(numero_de_cp_rico)
+#    print(numero_de_cp_piloto)
+#    print(numero_de_cp_pobre)
+
+    media_resistencia_rico = 0
+    media_resistencia_piloto = 0
+    media_resistencia_pobre = 0
+
+    resistencias_piloto = Cp_piloto.query.filter_by(ensaio_id=id).all()
+    resistencias_rico = Cp_rico.query.filter_by(ensaio_id=id).all()
+    resistencias_pobre = Cp_pobre.query.filter_by(ensaio_id=id).all()
+
+    for i in resistencias_piloto:
+        media_resistencia_piloto = media_resistencia_piloto + i.resistencia/numero_de_cp_piloto
+
+    for i in resistencias_rico:
+        media_resistencia_rico = media_resistencia_rico + i.resistencia/numero_de_cp_rico
+
+    for i in resistencias_pobre:
+        media_resistencia_pobre = media_resistencia_pobre + i.resistencia/numero_de_cp_pobre
+
+    print('resultados:')
+    print(media_resistencia_pobre)
+    print(media_resistencia_rico)
+    print(media_resistencia_piloto)
+
     rr = [pb[0].resistencia, p[0].resistencia, ri[0].resistencia]
     ac = [acpb, acp, acr]
     m = [d.pobre, d.piloto, d.rico]
-    cc = [479,371,295]
-    alfas = [1,2,3]
-
-
-
-    r = Regressao(alfas, rr, ac, m, cc)
-    print('resistencias')
+    cc = [295,371,479]
+#PRECISO COLOCAR INPUT DE DADOS PARA OS VALORES DE "C"!!!!
+    r = Regressao(rr, ac, m, cc)
+    print('rr')
     print(rr)
-    print('agua/cimento')
-    print(ac)
-    print('valores m')
-    print(m)
-    print("k's")
-    print(r.k1())
-    print(r.k2())
-    print(r.k3())
-    print(r.k4())
-    print(r.k5())
-    print(r.k6())
-    '''
-    '''
+    if d.resultados == []:
+        resultado = Resultados(k1=r.k1(), k2=r.k2(), k3=r.k3(), k4=r.k4(), k5=r.k5(), k6=r.k6(), ensaio=d)
+        db.session.add(resultado)
+        db.session.commit()
+    else:
+        d.resultados[0].k1 = r.k1()
+        d.resultados[0].k2 = r.k2()
+        d.resultados[0].k3 = r.k3()
+        d.resultados[0].k4 = r.k4()
+        d.resultados[0].k5 = r.k5()
+        d.resultados[0].k6 = r.k6()
+        db.session.commit()
+
+    return render_template('resultados.html', id=id, r=r)
 
 
+@app.route('/calculadora/<int:id>', methods=['POST', 'GET'])
+def calculadora(id):
+    form = Calcular()
+    res = request.form.get("resistencia")
+    ensaio_salvo = Ensaios.query.filter_by(id=id).first()
+    k = ensaio_salvo.resultados
+    lista_k = [k[0].k1, k[0].k2, k[0].k3, k[0].k4, k[0].k5, k[0].k6]
 
 
+    abrams = 0
+    lyse = 0
+    molinari = 0
+    alfa_ideal = 0
+    areia_unitaria = 0
+    brita_unitaria = 0
 
+    if form.validate_on_submit():
+        calculo = Calculadora(lista_k, int(res))
+        abrams = calculo.abrams()
+        lyse = calculo.lyse()
+        molinari = calculo.molinari()
+        alfa_ideal = ensaio_salvo.dosagem_rico[-1].alfa
+        traco = Ensaio(alfa=alfa_ideal, m=lyse, agua=abrams)
+        areia_unitaria = traco.massas_unitarias()[1]
+        brita_unitaria = traco.massas_unitarias()[2]
 
-#   Lista com os valores [id piloto a_unitario...., id piloto....]
-#    agua_total = 0
-#    a = d.dosagem_piloto
-#    print(a)
-
-
-    '''Aqui estao colocados de forma correta os valores para a regressao.
-    print(id)
-    d = Ensaios.query.filter_by(id=id).first()
-    p = d.cp_piloto
-    ri = d.cp_rico
-    pb = d.cp_pobre
-    rr = [p[0].resistencia, ri[0].resistencia, pb[0].resistencia]
-    print(rr)
-    ac = [0.36,0.42,0.49]
-    mm = [d.piloto, d.rico, d.pobre]
-#    mm = [2,3,5]
-    cc = [479,371,295]
-    alfas = [1,2,3]
-    r = Regressao(alfas, rr, ac, mm,cc)
-    print('\nparametros')
-    print('resistencias')
-    print(rr)
-    print('ac')
-    print(ac)
-    print('m')
-    print(mm)
-    print(r.k1())
-    print(r.k2())
-    print(r.k3())
-    print(r.k4())
-    print(r.k5())
-    print(r.k6())
-    '''
-
-#    form = Confirmar_dosagem()#Criar esse formulario
-#    if form.validate_on_submit():
-#        print('validou')
-    '''
-    a = Cp_piloto.query.all()
-    b = Cp_rico.query.all()
-    c = Cp_pobre.query.all()
-    print(a)
-    print(b)
-    print(c)
-    d = Ensaios.query.filter_by(id=1).first()
-    print('\nd')
-    print(d)
-    e = d.cp_piloto
-    print('e')
-    print(e)
-    '''
-
-    return render_template('resultados.html', id=id)
-
-
-
-
-
-
-
+    return render_template('calculadora.html', id=id, form=form, abrams=abrams, lyse=lyse, molinari=molinari, alfa_ideal=alfa_ideal, areia_unitaria=areia_unitaria, brita_unitaria=brita_unitaria)
 
 
 
@@ -573,6 +563,7 @@ class Ensaios(db.Model):
     cp_piloto = db.relationship('Cp_piloto', backref='ensaio')
     cp_rico = db.relationship('Cp_rico', backref='ensaio')
     cp_pobre = db.relationship('Cp_pobre', backref='ensaio')
+    resultados = db.relationship('Resultados', backref='ensaio')
 
     def __repr__(self):
         return '\n<id: {}, nome: {} piloto: {}, rico: {}, pobre: {}, cp: {}, pesobrita: {}, slump: {}, umidade: {}, relation {} >'.format(self.id, self.nome, self.piloto, self.rico, self.pobre, self.cp, self.pesobrita, self.slump, self.umidade, self.dosagem_piloto)
@@ -684,9 +675,19 @@ class Cp_pobre(db.Model):
         return '<id: {}, r: {} MPa, ensaio_id {}>'.format(self.id, self.resistencia, self.ensaio_id)
 
 
+class Resultados(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    k1 = db.Column(db.Integer)
+    k2 = db.Column(db.Integer)
+    k3 = db.Column(db.Integer)
+    k4 = db.Column(db.Integer)
+    k5 = db.Column(db.Integer)
+    k6 = db.Column(db.Integer)
 
+    ensaio_id = db.Column(db.Integer, db.ForeignKey('ensaios.id'))
 
-
+    def __repr__(self):
+        return '<k1 {}, k2 {}, k3 {}, k4 {}, k5 {}, k6 {}>'.format(self.k1, self.k2, self.k3, self.k4, self.k5, self.k6)
 
 
 

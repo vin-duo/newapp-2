@@ -2,8 +2,7 @@ import math
 
 
 class Regressao():
-	def __init__(self, valores_alfa=[], valores_resistencia=[],  valores_ac=[], valores_m=[],valores_C=[], arredondamento=3):
-		self.alfa=valores_alfa
+	def __init__(self, valores_resistencia=[],  valores_ac=[], valores_m=[],valores_C=[], arredondamento=3):
 		self.valores_resistencia_log=tuple(map(lambda var: math.log10(var), valores_resistencia))
 		self.valores_ac=valores_ac
 		self.valores_m=valores_m
@@ -62,32 +61,68 @@ class Regressao():
 
 
 
+class Calculadora():
+	def __init__(self, k, fc):
+		self.k = k
+		self.fc = fc
+
+	def abrams(self):
+		a = math.log(self.k[0]/self.fc, self.k[1])
+		return round(a,3)
+
+	def lyse(self):
+		m = self.k[2] + self.k[3]*self.abrams()
+		return round(m,3)
+
+	def molinari(self):
+		c = 1000/(self.k[4] + self.k[5]*self.lyse())
+		return round(c,3)
+
+
+
 '''
-va = [1,2,3]
 vr = [38,28,20]
 vac = [0.41,0.55,0.7]
 vm = [4,5,6]
-#vc = [1000/472,1000/371,1000/309]
 vc = [472,371,309]
 
-r = Regressao(va,vr,vac,vm,vc)
-
+r = Regressao(vr,vac,vm,vc)
+k = [r.k1(),r.k2(),r.k3(),r.k4(),r.k5(),r.k6()]
+d = Calculadora(k,35)
 print(r.k1())
 print(r.k2())
 print(r.k3())
 print(r.k4())
 print(r.k5())
 print(r.k6())
+print('\n')
+
+print(d.abrams())
+print(d.lyse())
+print(d.molinari())
+print('------')
+
+alfa = 0.51
+m = d.lyse()
+areia = alfa * (1+m) - 1
+pedra = m - areia
+agua = d.abrams()
+print('traço unitario: 1 : {} : {} : {}'.format(areia, pedra, agua))
+
+'''
 
 
 
-va = [1,2,3]
+'''
+
 vr = [57.5,43.7,31.4]
 vac = [0.36,0.42,0.49]
 vm = [3,4,5]
 vc = [479,371,295]
 
-r = Regressao(va,vr,vac,vm,vc)
+r = Regressao(vr,vac,vm,vc)
+k = [r.k1(),r.k2(),r.k3(),r.k4(),r.k5(),r.k6()]
+d = Calculadora(k,50)
 
 print('\n')
 print(r.k1())
@@ -96,4 +131,51 @@ print(r.k3())
 print(r.k4())
 print(r.k5())
 print(r.k6())
+print('\n')
+print(d.abrams())
+print(d.lyse())
+print(d.molinari())
+print('------')
+
 '''
+
+'''
+
+print(r.k1())
+print(r.k2())
+print(r.k3())
+print(r.k4())
+print(r.k5())
+print(r.k6())
+print('\n')
+print(d.abrams())
+print(d.lyse())
+print(d.molinari())
+print('------')
+
+
+vr = [57.5,43.7,31.4]
+vac = [0.36,0.42,0.49]
+vm = [3,4,5]
+vc = [479,371,295]
+
+r = Regressao(vr,vac,vm,vc)
+k = [r.k1,r.k2,r.k3,r.k4,r.k5,r.k6]
+d = Calculadora(k,50)
+
+print('\n')
+print(r.k1())
+print(r.k2())
+print(r.k3())
+print(r.k4())
+print(r.k5())
+print(r.k6())
+print('\n')
+print(d.abrams())
+print(d.lyse())
+print(d.molinari())
+print('------')
+
+'''
+
+

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1>Calculadora</h1>
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                {{ form.resistencia.label }}<br>
+                {{ form.resistencia(size=3) }}{{ form.calcular(class="btn btn-secondary") }}
+            </form>
+
+</div>
+
+{% if calculo %}
+	{{ calculo }}
+{% endif %}
+
+<div class="container">
+    <div class = "row">
+        <div class="col-3">
+            <br>
+
+
+        </div>
+
+
+	    <div class="col-9">
+	        <div class="container">
+
+	        <ul class="nav nav-tabs">
+	          <li class="nav-item">
+	            <a class="nav-link" aria-current="page" href="/dosagem/{{ id }}">Piloto</a>
+	          </li>
+	          <li class="nav-item">
+	            <a class="nav-link" href="/auxiliar/{{ id }}">Auxiliar</a>
+	          </li>
+	          <li class="nav-item">
+	            <a class="nav-link" href="/corpo_de_prova/{{ id }}">Corpo de Prova</a>
+	          </li>
+	          <li class="nav-item">
+	            <a class="nav-link" href="/resultados/{{ id }}">Resultados</a>
+	          </li>
+	          <li class="nav-item">
+	            <a class="nav-link active" href="/calculadora/{{ id }}">Calculadora</a>
+	          </li>
+	        </ul>
+	        <br>
+
+			{% if abrams != 0 %}
+
+		        <h4>Traço unitário</h4>
+		        <h3>  1 : {{ areia_unitaria }} : {{ brita_unitaria }} : {{ abrams }}</h3>
+
+		        <h4>Teor de argamassa</h4>
+		        <h3>  {{ lyse }} </h3>
+
+		        <h4>Consumo de cimento</h4>
+		        <h3>  {{ molinari }}</h3>
+
+			{% endif %}
+
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

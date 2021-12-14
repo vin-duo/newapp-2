@@ -1,6 +1,7 @@
 #para os forms 222
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, FloatField
+from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired
 
 
@@ -22,4 +23,12 @@ class Alfa(FlaskForm):
     alfa = FloatField('Alfa:')
     submit = SubmitField('Registrar')
 
+class Calcular(FlaskForm):
+    resistencia = FloatField('Resistencia')
+    calcular = SubmitField('Calcular')
 
+
+'''
+class Alfa_ideal(FlaskForm):
+    alfa_ideal = QuerySelectField(allow_blank=True, get_label='id')
+'''

@@ -31,6 +31,9 @@
                   <li class="nav-item">
                     <a class="nav-link active" href="/resultados/{{ id }}">Resultados</a>
                   </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/calculadora/{{ id }}">Calculadora</a>
+              </li>
                 </ul>
                 <br>
 
@@ -50,6 +53,17 @@
         </button>
     </h2>
     <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
+        <div>
+            <h4>
+            k1: {{ r.k1() }}<br>
+            k2: {{ r.k2() }}<br>
+            k3: {{ r.k3() }}<br>
+            k4: {{ r.k4() }}<br>
+            k5: {{ r.k5() }}<br>
+            k6: {{ r.k6() }}<br>
+            </h4>
+        </div>
+
         <div class="accordion-body">
 
                 <h4>Traço PILOTO<br>m: {{ m }}<br>Slump: {{ slump }} mm</h4>
